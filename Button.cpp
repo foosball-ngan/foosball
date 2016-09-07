@@ -4,6 +4,7 @@
 Button::Button(uint8_t pin) {
 	_pin = pin;
 	_state = LOW;
+  pinMode(_pin, INPUT);
 }
 
 bool Button::pressed(void) {
