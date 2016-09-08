@@ -29,18 +29,17 @@ byte seven_seg_digits[10][7] = {
   { 1, 1, 1, 0, 0, 1, 1 },  // = 9
 };
 
-
 // IR
-IRsend irsend; // pin 3 on uno, pin 7 on mega
+IRsend irsend; // pin 3 on uno, pin 9 on mega
 #define P1_PIN_DETECT 0
 #define P2_PIN_DETECT 2
 
 // Buttons
-Button button_reset(57);
+Button button_reset(50);
 Button button_p1_increase(51);
-Button button_p1_decrease(54);
-Button button_p2_increase(55);
-Button button_p2_decrease(56);
+Button button_p1_decrease(52);
+Button button_p2_increase(53);
+Button button_p2_decrease(22);
 
 void setup() {
   // debug
@@ -70,7 +69,11 @@ void debugScore() {
 
 void displayScore(byte player, byte number) {
   debugScore();
-  
+  /*
+  static int i = 0;
+  Serial.println(i);
+  i++;
+  */
   for (byte pin = 0; pin < 7; ++pin) {
     digitalWrite(seven_seg_pins[player][pin], seven_seg_digits[number][pin]);
   }
@@ -115,15 +118,14 @@ void loop() {
     delay(1500);
   }
 */
-/*
+
   int p2_goal = analogRead(P1_PIN_DETECT);
-  //Serial.println(p2_goal);
-  if (p2_goal == 0) {
+  if (p2_goal > 0) {
     ++p2_score;
     displayScore(P2, p2_score);
     delay(1500);
   }
-*/
+
   delay(100);
 }
 
