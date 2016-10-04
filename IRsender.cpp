@@ -1,8 +1,9 @@
-#include "IRSend.h"
+#include "IRsender.h"
+#include <Arduino.h>
 
 #define IR_FREQUENCY_KHZ (38)
 
-void IRsend::enable_send_on_pin_11()
+void IRsender::enable_send_on_pin_11()
 {
   // Disable timer interrupt
   TIMSK1 = _BV(OCIE1A);
@@ -21,7 +22,7 @@ void IRsend::enable_send_on_pin_11()
   TCCR1A |= _BV(COM1A1);
 }
 
-void IRsend::enable_send_on_pin_9()
+void IRsender::enable_send_on_pin_9()
 {
   // Disable timer interrupt
   TIMSK2 = 0;
@@ -33,7 +34,7 @@ void IRsend::enable_send_on_pin_9()
   // Setup frequency
   TCCR2A = _BV(WGM21);
   TCCR2B = _BV(CS21);
-  OCR2A  = TIMER_COUNT_TOP / 8;
+  OCR2A  = F_CPU * 50 / 1000000 / 8;
   TCNT2  = 0;
   
   // Enable PWM (i.e. GO!!)

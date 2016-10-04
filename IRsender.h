@@ -2,13 +2,13 @@
  * Relevant parts were stolen from the arduino IRremote library
  */
 
-#ifndef IRsend_h
-#define IRsend_h
+#ifndef IRsender_h
+#define IRsender_h
 
-class IRsend
+class IRsender
 {
  public:
-  IRsend () { }
+  IRsender() { }
 
   void enable_send_on_pin_11(void);
   void enable_send_on_pin_9(void);

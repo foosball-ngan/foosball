@@ -1,5 +1,5 @@
 #include "Button.h"
-#include "IRsend.h"
+#include "IRsender.h"
 
 // Game
 #define P1 0
@@ -40,7 +40,7 @@ Button button_p2_increase(53);
 Button button_p2_decrease(22);
 
 // IR sending stuff
-IRsend ir;
+IRsender ir;
 
 void setup() {
   // debug
