@@ -1,19 +1,19 @@
-#include <IRremote.h>
-#include <IRremoteInt.h>
-
 #include "Button.h"
+#include "IRsend.h"
 
 // Game
 #define P1 0
 #define P2 1
+
+#define SCORE_DELAY 1500
 
 byte p1_score = 0;
 byte p2_score = 0;
 
 // Seven Segment
 byte seven_seg_pins[2][7] = {
-  { 38, 36, 30, 32, 34, 40, 42 },
-  { 39, 37, 31, 33, 35, 41, 43 },
+  { 38, 36, 34, 32, 30, 40, 42 }, // top, top-right, bottom-right, bottom, bottom-left, top-left, middle
+  { 41, 43, 31, 33, 35, 39, 37 },
 };
 
 byte seven_seg_digits[10][7] = {
@@ -29,10 +29,8 @@ byte seven_seg_digits[10][7] = {
   { 1, 1, 1, 0, 0, 1, 1 },  // = 9
 };
 
-// IR
-IRsend irsend; // pin 3 on uno, pin 9 on mega
 #define P1_PIN_DETECT 0
-#define P2_PIN_DETECT 2
+#define P2_PIN_DETECT 1
 
 // Buttons
 Button button_reset(50);
@@ -41,15 +39,20 @@ Button button_p1_decrease(52);
 Button button_p2_increase(53);
 Button button_p2_decrease(22);
 
+// IR sending stuff
+IRsend ir;
+
 void setup() {
   // debug
   Serial.begin(9600);
 
-  // IR
+  // IR receiving
   pinMode(P1_PIN_DETECT, INPUT);
   pinMode(P2_PIN_DETECT, INPUT);
-  irsend.enableIROut(38);
-  irsend.mark(0);
+
+  // IR sending
+  ir.enable_send_on_pin_11();
+  ir.enable_send_on_pin_9();
 
   // seven segment display
   for (byte player = 0; player < 2; ++player) {
@@ -57,6 +60,12 @@ void setup() {
       pinMode(seven_seg_pins[player][pin], OUTPUT);
     }
   }
+
+  // reset scores
+  p1_score = 0;
+  p2_score = 0;
+  displayScore(P1, p1_score);
+  displayScore(P2, p2_score);
 }
 
 void debugScore() {
@@ -69,11 +78,7 @@ void debugScore() {
 
 void displayScore(byte player, byte number) {
   debugScore();
-  /*
-  static int i = 0;
-  Serial.println(i);
-  i++;
-  */
+
   for (byte pin = 0; pin < 7; ++pin) {
     digitalWrite(seven_seg_pins[player][pin], seven_seg_digits[number][pin]);
   }
@@ -81,13 +86,14 @@ void displayScore(byte player, byte number) {
 
 void loop() {
   // detect button presses
+/*
   if (button_reset.pressed()) {
     p1_score = 0;
     p2_score = 0;
     displayScore(P1, p1_score);
     displayScore(P2, p2_score);
-  }
-  
+  }*/
+/*
   if (button_p1_increase.pressed()) {
     ++p1_score;
     displayScore(P1, p1_score);
@@ -107,25 +113,41 @@ void loop() {
     --p2_score;
     displayScore(P2, p2_score);
   }
- 
+ */
 /*
   // detect if any goals have been scored
-  //int p1_goal = analogRead(P2_PIN_DETECT);
+  int p1_goal = analogRead(P2_PIN_DETECT);
   //Serial.println(p1_goal);
-  if (p1_goal == 0) {
+  if (p1_goal > 0) {
     ++p1_score;
+    p1_score %= 10;
     displayScore(P1, p1_score);
-    delay(1500);
+    delay(SCORE_DELAY);
+    //return;
   }
 */
 
   int p2_goal = analogRead(P1_PIN_DETECT);
-  if (p2_goal > 0) {
+  //Serial.println(p2_goal);
+  if (p2_goal > 1000) {
     ++p2_score;
+    p2_score %= 10;
     displayScore(P2, p2_score);
-    delay(1500);
+    delay(SCORE_DELAY);
+    return;
   }
 
-  delay(100);
+
+  int p1_goal = analogRead(P2_PIN_DETECT);
+  //Serial.println(p1_goal);
+  if (p1_goal > 1000) {
+    ++p1_score;
+    p1_score %= 10;
+    displayScore(P1, p1_score);
+    delay(SCORE_DELAY);
+    return;
+  }
+
+  //delay(50);
 }
 
